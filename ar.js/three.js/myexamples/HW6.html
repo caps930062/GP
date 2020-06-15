@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<!-- three.js library -->
+<script src='../examples/vendor/three.js/build/three.min.js'></script>
+<script src="../examples/vendor/three.js/examples/js/libs/stats.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<!-- ar.js -->
+<script src="../build/ar.js"></script>
+<script>THREEx.ArToolkitContext.baseURL = '../'</script>
+
+<body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
+<div style='font-size:2em;position: absolute; top: 10px; width:100%; text-align: center; z-index: 1;'>
+	HW-6
+	<br>
+	<p id='printDis'></p>
+</div>
+<audio id="soundtrack" autoplay="" loop="" style="display:none">
+    <source src="https://madhipoo.github.io/html/music/Us.mp3" type="audio/mp3">
+</audio>
+<script>
+
+// global variables
+var renderer, scene, camera;
+var stats;
+var markerHiro;
+var arToolKitSource, arToolKitContext;
+var soundTrack,soundVal = 0.15, sign = 0.3;
+var raycaster, pickables;
+var _iOSDevice;
+
+init();
+animate();
+
+function init() {
+	let _iOSDevice = !!navigator.platform.match(/iPhone|iPod|iPad/);
+
+	console.log ('iOS: ' + _iOSDevice)
+
+    soundTrack = document.getElementById ('soundtrack');
+	// init renderer
+	renderer	= new THREE.WebGLRenderer({
+		// antialias	: true,
+		alpha: true
+	});
+	renderer.setClearColor(new THREE.Color('lightgrey'), 0)
+	// renderer.setPixelRatio( 1/2 );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.domElement.style.position = 'absolute'
+	renderer.domElement.style.top = '0px'
+	renderer.domElement.style.left = '0px'
+	document.body.appendChild( renderer.domElement );
+
+	// init scene and camera
+	scene	= new THREE.Scene();
+	
+	camera = new THREE.Camera();
+	scene.add(camera);
+	//          handle arToolkitSource
+
+	arToolkitSource = new THREEx.ArToolkitSource({
+		sourceType : 'webcam',
+	
+	})
+
+	arToolkitSource.init(function onReady(){
+		onResize()
+	})
+	
+	// handle resize
+	window.addEventListener('resize', function(){
+		onResize()
+	})
+	function onResize(){
+		arToolkitSource.onResize()	
+		arToolkitSource.copySizeTo(renderer.domElement)	
+		if( arToolkitContext.arController !== null ){
+			arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)	
+		}	
+	}
+	////////////////////////////////////////////////////////////////////////////////
+	//          initialize arToolkitContext
+	////////////////////////////////////////////////////////////////////////////////
+	
+	arToolkitContext = new THREEx.ArToolkitContext({
+		cameraParametersUrl: THREEx.ArToolkitContext.baseURL + '../data/data/camera_para.dat',
+		detectionMode: 'mono',
+		maxDetectionRate: 30,
+		canvasWidth: 80*3,
+		canvasHeight: 60*3,
+	})
+	// initialize it
+	arToolkitContext.init(function onCompleted(){
+		// copy projection matrix to camera
+		camera.projectionMatrix.copy( arToolkitContext.getProjectionMatrix() );
+	})
+
+	markerHiro = addMarkerHiro();
+	scene.add (markerHiro); // hide at first
+	
+	
+	stats = new Stats();
+	document.body.appendChild( stats.dom );
+
+
+}
+
+	
+
+	
+function addMarkerHiro () {
+	let markerRoot = new THREE.Group();
+	var artoolkitMarker = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+		type : 'pattern',
+		 patternUrl : THREEx.ArToolkitContext.baseURL + '../data/data/patt.hiro'
+	})
+
+	var geometry	= new THREE.PlaneGeometry(2.25,1.5);
+		
+	let loader = new THREE.TextureLoader();
+	loader.setCrossOrigin('')
+	let texture = loader.load( 'https://i.imgur.com/hNndZ9Q.jpg' );
+	
+	let material = new THREE.MeshBasicMaterial( { 
+		map: texture,
+		transparent: true,
+		side: THREE.DoubleSide
+		} );
+
+	let mesh	= new THREE.Mesh( geometry, material );
+	//mesh.position.y	= geometry.parameters.height/2
+    mesh.rotation.x = -Math.PI/2;
+	//mesh.position.z = 0.5;
+	markerRoot.add (mesh);
+
+    var babygeometry = new THREE.PlaneGeometry(0.5,1);
+    texture = loader.load( 'https://i.imgur.com/VuPSsjG.png' );
+    let babymaterial = new THREE.MeshBasicMaterial( { 
+		map: texture,
+        alpha:0.3,
+		transparent: true,
+		side: THREE.DoubleSide
+	} );
+    let babymesh	= new THREE.Mesh( babygeometry, babymaterial );
+    babymesh.position.set(-0.5,0.25,0.25);
+    babymesh.rotation.x = -Math.PI/2;
+    markerRoot.add (babymesh);
+
+    var mygeometry = new THREE.PlaneGeometry(0.5,1);
+    texture = loader.load( 'https://i.imgur.com/p7ehTqT.png' );
+    let mymaterial = new THREE.MeshBasicMaterial( { 
+		map: texture,
+        alpha:0.3,
+		transparent: true,
+		side: THREE.DoubleSide
+	} );
+    let mymesh	= new THREE.Mesh( mygeometry, mymaterial );
+    mymesh.position.set(0.5,0.25,0.225);
+    mymesh.rotation.x = -Math.PI/2;
+    markerRoot.add (mymesh);
+
+	var wordgeometry = new THREE.PlaneGeometry(0.5,0.25);
+    texture = loader.load( 'https://i.imgur.com/MRt7SiB.png' );
+    let wordmaterial = new THREE.MeshBasicMaterial( { 
+		map: texture,
+        alpha:0.3,
+		transparent: true,
+		side: THREE.DoubleSide
+	} );
+    let wordmesh	= new THREE.Mesh( wordgeometry, wordmaterial );
+    wordmesh.position.set(0.5,0.1,-0.5);
+    wordmesh.rotation.x = -Math.PI/2;
+    markerRoot.add (wordmesh);
+	
+	//markerRoot.add(textmesh);
+	/// add gridhelper
+	var gridXZ = new THREE.GridHelper(1,10);
+	//markerRootHiro.add (gridXZ);
+	
+	return markerRoot;
+}
+
+
+function animate() {
+
+    soundVal += sign*0.01;
+	soundVal = THREE.Math.clamp (soundVal, 0, 0.5);
+	soundtrack.volume = soundVal;
+
+	requestAnimationFrame (animate);
+
+	if( arToolkitSource.ready === false )	return
+	arToolkitContext.update( arToolkitSource.domElement )
+		
+	renderer.render (scene, camera);
+	stats.update();
+
+	/*let did =  markerHiro.position.distanceTo (markerKanji.position)
+	console.log (did)
+	$('#printDis').text ('DIS: ' + did.toFixed(2))*/
+	
+	// billboard of Hulk
+	// camera at eye coord: (0,0,0)
+	// corresponding marker coordinate:
+	let p0 = new THREE.Vector3 (0,0,0)
+	let mw = new THREE.Matrix4();		
+	p0.applyMatrix4 (mw.getInverse(markerHiro.matrixWorld));
+
+	p0.z = 0;
+	let front = new THREE.Vector3(-1,0,0);
+	let angle = p0.angleTo (front)-Math.PI/2;
+	let axis = new THREE.Vector3();
+	axis.crossVectors ( front, p0 ).normalize();
+	if (axis.z < 0){
+		markerHiro.children[1].rotation.y = angle;
+        markerHiro.children[2].rotation.y = angle;
+    }
+	else {
+		markerHiro.children[1].rotation.y = -angle;
+        markerHiro.children[2].rotation.y = -angle;
+    }
+}
+
+</script></body>
