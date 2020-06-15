@@ -1,0 +1,406 @@
+
+<html>
+<style>
+#info {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  color: #ffff00
+}
+#gui {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+}
+body {
+  overflow: hidden;
+}
+
+
+</style>
+
+<head>
+</head>
+
+<body>
+	<div id="info">
+	  <button id="play" style="width:20%">Play Music</button>
+	</div>
+
+	<audio id="soundtrack" autoplay loop style="display:none">
+		<source src="HW3music.mp3" type='audio/mp3'>
+	</audio>
+<div id="info">hw3</div>
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script>
+
+</script>
+
+<script>
+var camera, scene, renderer;
+var torso;
+var T = 5;
+var theta = 0;
+var gcontrols; // for dat-gui
+var clock = new THREE.Clock();
+var ts = clock.getElapsedTime()
+var isPaused = false;
+
+var pose1 ={theta1: -0.09217800363973483,
+            theta2: 0.3403286948681511,
+            theta3: 0.45278534979004537,
+            theta4: 0.34,
+            theta5: 0.26760082098950744,
+            theta6: -0.2538947711209296,
+            theta7: -0.3836968453046201,
+            theta8: -0.1708210891956583};
+var pose2 ={theta1: 0.2711308986467853,
+            theta2: 0.3403286948681511,
+            theta3: -0.02405758446101247,
+            theta4: 0.34,
+            theta5: -0.33717558342646814,
+            theta6: -0.23728003473587544,
+            theta7: 0.26760082098950744,
+            theta8: -0.1708210891956583}
+var pose3={ theta1: -0.09217800363973483,
+            theta2: 0.3403286948681511,
+            theta3: 0.45278534979004537,
+            theta4: 0.34,
+            theta5: 0.08151577347689953,
+            theta6: -0.2538947711209296,
+            theta7: -0.2557633751397022,
+            theta8: -0.1708210891956583}
+var pose4={ theta1: 0.2711308986467853,
+            theta2: 0.3403286948681511,
+            theta3: -0.02405758446101247,
+            theta4: 0.34,
+            theta5: -0.2557633751397022,
+            theta6: -0.23202563543059296,
+            theta7: 0.0931460889464375,
+            theta8: -0.1708210891956583}
+var keys = [
+  [0.075, pose1],
+  [0.15, pose3],
+  [0.225, pose1],
+  [0.3, pose2],
+  [0.375, pose4],
+  [0.45, pose2],
+  [0.525, pose1],
+  [0.6, pose3],
+  [0.675, pose1],
+  [0.75, pose2],
+  [0.825, pose4],
+  [0.9, pose2],
+  [1, pose1],
+];
+init();
+animate();
+$("#play").click(function() {
+  isPaused = !isPaused;
+	if (isPaused) { 
+		$('#play').text ('Play Music');
+		soundtrack.pause();
+	} else {
+		$('#play').text ('Pause Music');
+		soundtrack.play();
+	}
+});
+function collising()
+{
+	var audio = document.createElement("audio");
+	audio.volume = 0.02;
+	audio.src = "select01.mp3";
+	audio.play();
+}
+collising();
+
+  
+function torsoMove(){
+  torso.children[4].rotation.y = intKey[0] //gcontrols.upperALY
+  torso.children[4].children[2].rotation.y = intKey[1] //gcontrols.lowerALY
+  torso.children[5].rotation.y = intKey[2] //gcontrols.upperALY
+  torso.children[5].children[2].rotation.y = intKey[3] //gcontrols.lowerALY
+  torso.children[6].rotation.x = intKey[4] //gcontrols.upperALY
+  torso.children[6].children[2].rotation.x = intKey[5] //gcontrols.lowerALY
+  torso.children[7].rotation.x = intKey[6] //gcontrols.upperALY
+  torso.children[7].children[2].rotation.x = intKey[7] //gcontrols.lowerALY
+  
+}
+function loadJSON(){
+  return{
+  "preset": "Default",
+  "closed": false,
+  "remembered": {
+    "1": {
+      "0": {
+        "theta1": -0.09217800363973483,
+        "theta2": 0.3403286948681511,
+        "theta3": 0.45278534979004537,
+        "theta4": 0.34,
+        "theta5": 0.26760082098950744,
+        "theta6": -0.2538947711209296,
+        "theta7": -0.3836968453046201,
+        "theta8": -0.1708210891956583
+      }
+    },
+    "2": {
+      "0": {
+        "theta1": 0.2711308986467853,
+        "theta2": 0.3403286948681511,
+        "theta3": -0.02405758446101247,
+        "theta4": 0.34,
+        "theta5": -0.5,
+        "theta6": -0.23202563543059296,
+        "theta7": 0.3606433447458114,
+        "theta8": -0.1708210891956583
+      }
+    },
+    "Default": {
+      "0": {
+        "theta1": -0.09217800363973483,
+        "theta2": 0.3403286948681511,
+        "theta3": 0.45278534979004537,
+        "theta4": 0.34,
+        "theta5": 0.26760082098950744,
+        "theta6": -0.2538947711209296,
+        "theta7": -0.3836968453046201,
+        "theta8": -0.1708210891956583
+      }
+    },
+    "1.1": {
+      "0": {
+        "theta1": -0.09217800363973483,
+        "theta2": 0.3403286948681511,
+        "theta3": 0.45278534979004537,
+        "theta4": 0.34,
+        "theta5": 0.08151577347689953,
+        "theta6": -0.2538947711209296,
+        "theta7": -0.2557633751397022,
+        "theta8": -0.1708210891956583
+      }
+    },
+    "2.2": {
+      "0": {
+        "theta1": 0.2711308986467853,
+        "theta2": 0.3403286948681511,
+        "theta3": -0.02405758446101247,
+        "theta4": 0.34,
+        "theta5": -0.2557633751397022,
+        "theta6": -0.23202563543059296,
+        "theta7": 0.0931460889464375,
+        "theta8": -0.1708210891956583
+      }
+    }
+  },
+  "folders": {}
+
+}
+}
+
+function keyframe(t) {
+  var s = ((t - ts) % T) / T;
+
+  for (var i = 1; i < keys.length; i++) {
+    if (keys[i][0] > s) break;
+  }
+  // take i-1
+  var ii = i - 1;
+  //console.log (keys[ii][0])
+  var a = (s - keys[ii][0]) / (keys[ii + 1][0] - keys[ii][0]);
+  intKey = 
+  [
+		keys[ii][1].theta1 * (1 - a) + keys[ii + 1][1].theta1 * a,
+    keys[ii][1].theta2 * (1 - a) + keys[ii + 1][1].theta2 * a,
+    keys[ii][1].theta3 * (1 - a) + keys[ii + 1][1].theta3 * a,
+		keys[ii][1].theta4 * (1 - a) + keys[ii + 1][1].theta4 * a,
+    keys[ii][1].theta5 * (1 - a) + keys[ii + 1][1].theta5 * a,
+    keys[ii][1].theta6 * (1 - a) + keys[ii + 1][1].theta6 * a,
+    keys[ii][1].theta7 * (1 - a) + keys[ii + 1][1].theta7 * a,
+    keys[ii][1].theta8 * (1 - a) + keys[ii + 1][1].theta8 * a,
+  ];
+
+  //console.log (intKey);  // array linear combo?!
+}
+
+function init() {
+
+  scene = new THREE.Scene();
+
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x888888);
+  document.body.appendChild(renderer.domElement);
+
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
+  camera.position.z = 70;
+  camera.position.y = 50;
+  camera.position.x = 70;
+  let controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+  ////////////////////////////////////////////////////////////////
+  var gridXZ = new THREE.GridHelper(200, 20, 'red', 'white');
+  scene.add(gridXZ);
+/////// ////////////////////
+  
+	var mat = new THREE.MeshNormalMaterial();
+  
+  //body
+  torso = new THREE.Group();
+  var torsobody = new THREE.Mesh (new THREE.BoxGeometry(10,15,5),mat);
+  torso.add (torsobody);
+  torsobody.position.y = 7.5;
+  torso.add (new THREE.AxesHelper(6));
+  torso.position.y = 17;
+  scene.add (torso);
+  
+  //head
+  var torsobody = new THREE.Mesh (new THREE.BoxGeometry(5,5,5),mat);
+  torso.add (torsobody);
+  torsobody.position.y = 17.5;
+  torso.add (new THREE.AxesHelper(6));
+  
+  //left arm
+  var upperArm = new THREE.Group();
+  var armbody = new THREE.Mesh (new THREE.BoxGeometry (5,2,2), mat);
+  armbody.position.x = 2.5;
+  upperArm.add (armbody);
+  upperArm.add (new THREE.AxesHelper(4))
+  let tmp = new THREE.Group();
+  let lowerArm = new THREE.Mesh (new THREE.BoxGeometry (5,2,2), mat);
+  tmp.add(lowerArm);
+  tmp.position.set(5,0,0);
+  lowerArm.position.x=2;
+  upperArm.add(tmp);
+  torso.add (upperArm);
+  upperArm.position.set (6, 15,0);
+  upperArm.rotation.order = 'ZYX';
+  upperArm.rotation.z = -Math.PI/2;
+  upperArm.rotation.y = -Math.PI/2;
+  
+  
+  
+  //right arm
+  upperArm = new THREE.Group();
+  armbody = new THREE.Mesh (new THREE.BoxGeometry (5,2,2), mat);
+  armbody.position.x = 2.5;
+  upperArm.add (armbody);
+  upperArm.add (new THREE.AxesHelper(4))
+  torso.add (upperArm);
+  tmp = new THREE.Group();
+  lowerArm = new THREE.Mesh (new THREE.BoxGeometry (5,2,2), mat);
+  tmp.add(lowerArm);
+  tmp.position.set(5,0,0);
+  lowerArm.position.x=2;
+  upperArm.add(tmp);
+  upperArm.position.set (-6, 15,0);
+  upperArm.rotation.order = 'ZYX';
+  upperArm.rotation.z = -Math.PI/2;
+  upperArm.rotation.y = -Math.PI/2;
+  
+  //left leg
+  var upperArm = new THREE.Group();
+  var armbody = new THREE.Mesh (new THREE.BoxGeometry (3,10,5), mat);
+  armbody.position.y = -3.7;
+  upperArm.add (armbody);
+  upperArm.add (new THREE.AxesHelper(4))
+  
+  tmp = new THREE.Group();
+  lowerArm = new THREE.Mesh (new THREE.BoxGeometry (3,10,5), mat);
+  tmp.add(lowerArm);
+  tmp.position.set(0,-5,0);
+  lowerArm.position.y=-7.5;
+  lowerArm.position.z=0.25;
+  upperArm.add(tmp);
+  
+  torso.add (upperArm);
+  upperArm.position.set (-3.5,0,0);
+  upperArm.rotation.order = 'ZYX';
+  
+  //right leg
+  upperArm = new THREE.Group();
+  armbody = new THREE.Mesh (new THREE.BoxGeometry (3,10,5), mat);
+  armbody.position.y = -3.7;
+  upperArm.add (armbody);
+  upperArm.add (new THREE.AxesHelper(4))
+  tmp = new THREE.Group();
+  lowerArm = new THREE.Mesh (new THREE.BoxGeometry (3,10,5), mat);
+  tmp.add(lowerArm);
+  tmp.position.set(0,-5,0);
+  lowerArm.position.y=-7.5;
+  lowerArm.position.z=0.25;
+  upperArm.add(tmp);
+  torso.add (upperArm);
+  upperArm.position.set (3.5, 0,0);
+  upperArm.rotation.order = 'ZYX';
+	
+  gcontrol = {
+    theta1: 0.01,
+    theta2: 0.01,
+    theta3: 0.01,
+    theta4: 0.01,
+    theta5: 0.01,
+    theta6: 0.01,
+    theta7: 0.01,
+    theta8: 0.01,
+  };
+  
+	//gui
+  var gui = new dat.GUI({
+  	load: loadJSON(),
+    preset: "Default"
+  });
+  
+  gui.domElement.id = 'gui';
+
+	gui.remember (gcontrol);
+  gui.add(gcontrol, 'theta1', -1.50, 0.55);
+  gui.add(gcontrol, 'theta2', 0.09, 2.35);
+  gui.add(gcontrol, 'theta3', -1.50, 0.55);
+  gui.add(gcontrol, 'theta4', 0.09, 2.35);
+  gui.add(gcontrol, 'theta5', -0.50, 0.55);
+  gui.add(gcontrol, 'theta6', -1.52, 0.01);
+  gui.add(gcontrol, 'theta7', -0.50, 0.55);
+  gui.add(gcontrol, 'theta8', -1.52, 0.01);
+  
+}
+
+function animate() {
+	keyframe (clock.getElapsedTime())
+	torsoMove();
+	theta += 0.01;
+  requestAnimationFrame(animate);
+  render();
+  torso.children[4].rotation.y = gcontrol.theta1;
+  torso.children[4].children[2].rotation.y = -gcontrol.theta2;
+  torso.children[5].rotation.y = gcontrol.theta3;
+  torso.children[5].children[2].rotation.y = -gcontrol.theta4;
+  torso.children[6].rotation.x = gcontrol.theta5;
+  torso.children[6].children[2].rotation.x = -gcontrol.theta6;
+  torso.children[7].rotation.x = gcontrol.theta7;
+  torso.children[7].children[2].rotation.x = -gcontrol.theta8;
+  
+  torso.position.set (-60*Math.cos(theta), 17, 60*Math.sin(theta));
+  torso.rotation.y = theta + Math.PI;
+
+}
+
+function render() {
+
+  renderer.render(scene, camera);
+
+}
+function collising()
+{
+	var audio = document.createElement("audio");
+	audio.volume = 0.02;
+	audio.src = "select01.mp3";
+	audio.play();
+}
+
+
+</script>
+</body>
+</html>
