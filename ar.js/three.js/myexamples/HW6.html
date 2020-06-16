@@ -17,7 +17,7 @@
 	<p id='printDis'></p>
 </div>
 <audio id="soundtrack" autoplay="" loop="" style="display:none">
-    <source src="https://madhipoo.github.io/html/music/Us.mp3" type="audio/mp3">
+    <source src="乾杯.mp3" type="audio/mp3">
 </audio>
 <script>
 
@@ -120,7 +120,7 @@ function addMarkerHiro () {
 		
 	let loader = new THREE.TextureLoader();
 	loader.setCrossOrigin('')
-	let texture = loader.load( 'https://i.imgur.com/hNndZ9Q.jpg' );
+	let texture = loader.load( 'https://i.imgur.com/yg5pxy9.jpg' );
 	
 	let material = new THREE.MeshBasicMaterial( { 
 		map: texture,
@@ -135,7 +135,7 @@ function addMarkerHiro () {
 	markerRoot.add (mesh);
 
     var babygeometry = new THREE.PlaneGeometry(0.5,1);
-    texture = loader.load( 'https://i.imgur.com/VuPSsjG.png' );
+    texture = loader.load( 'https://i.imgur.com/iHFk0lE.png' );
     let babymaterial = new THREE.MeshBasicMaterial( { 
 		map: texture,
         alpha:0.3,
@@ -148,7 +148,7 @@ function addMarkerHiro () {
     markerRoot.add (babymesh);
 
     var mygeometry = new THREE.PlaneGeometry(0.5,1);
-    texture = loader.load( 'https://i.imgur.com/p7ehTqT.png' );
+    texture = loader.load( 'https://i.imgur.com/0mmB004.png' );
     let mymaterial = new THREE.MeshBasicMaterial( { 
 		map: texture,
         alpha:0.3,
@@ -161,7 +161,7 @@ function addMarkerHiro () {
     markerRoot.add (mymesh);
 
 	var wordgeometry = new THREE.PlaneGeometry(0.5,0.25);
-    texture = loader.load( 'https://i.imgur.com/MRt7SiB.png' );
+    texture = loader.load( 'https://i.imgur.com/UorGoS8.png' );
     let wordmaterial = new THREE.MeshBasicMaterial( { 
 		map: texture,
         alpha:0.3,
