@@ -26,7 +26,7 @@ var renderer, scene, camera;
 var stats;
 var markerHiro;
 var arToolKitSource, arToolKitContext;
-var soundTrack,soundVal = 0.15, sign = 0.3;
+var soundTrack,soundVal = 0.30, sign = 0.3;
 var raycaster, pickables;
 var _iOSDevice;
 
@@ -143,7 +143,7 @@ function addMarkerHiro () {
 		side: THREE.DoubleSide
 	} );
     let babymesh	= new THREE.Mesh( babygeometry, babymaterial );
-    babymesh.position.set(-0.5,0.25,0.25);
+    babymesh.position.set(-0.5,0.3,0.3);
     babymesh.rotation.x = -Math.PI/2;
     markerRoot.add (babymesh);
 
@@ -156,11 +156,11 @@ function addMarkerHiro () {
 		side: THREE.DoubleSide
 	} );
     let mymesh	= new THREE.Mesh( mygeometry, mymaterial );
-    mymesh.position.set(0.5,0.25,0.225);
+    mymesh.position.set(0.5,0.3,0.3);
     mymesh.rotation.x = -Math.PI/2;
     markerRoot.add (mymesh);
 
-	var wordgeometry = new THREE.PlaneGeometry(0.5,0.25);
+	var wordgeometry = new THREE.PlaneGeometry(0.5,0.35);
     texture = loader.load( 'https://i.imgur.com/UorGoS8.png' );
     let wordmaterial = new THREE.MeshBasicMaterial( { 
 		map: texture,
